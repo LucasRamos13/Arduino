@@ -1,0 +1,95 @@
+int pinLoop;
+int pins[5] = {3, 5, 6, 9, 10};
+int sensorPin = 11;
+int mode;
+int i;
+int j;
+long duracao, distancia, aux;
+int binario[5];
+
+void setup()
+{
+  Serial.begin (9600);
+  pinMode(sensorPin, INPUT);
+  pinMode(3, OUTPUT);
+  pinMode(5, OUTPUT);
+  pinMode(6, OUTPUT);
+  pinMode(9, OUTPUT);
+  pinMode(10, OUTPUT);
+  
+  pinMode(13, OUTPUT);
+
+  pinLoop = -1;
+  mode = 0;
+}
+
+void loop()
+{
+  pinMode(sensorPin, OUTPUT);
+  digitalWrite(sensorPin, LOW);
+  delayMicroseconds(2);
+  digitalWrite(sensorPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(sensorPin, LOW);
+  pinMode(sensorPin, INPUT);
+  duracao   = pulseIn(sensorPin, HIGH);
+  distancia = (duracao/2)*0.034;
+  
+  if(distancia < 31){
+  	mode = 2;
+  }else{
+    if(mode==2){
+  		digitalWrite(3, LOW);
+    	digitalWrite(5, LOW);
+    	digitalWrite(6, LOW);
+    	digitalWrite(9, LOW);
+    	digitalWrite(10, LOW);
+    	mode = 0;
+    }
+  }
+  if (mode==0){
+      pinLoop++;
+      for(j=0;j<=255;j++){
+        	analogWrite(pins[pinLoop], j);
+        delay(1);
+        }
+      if(pinLoop == 5){
+          mode = 1;
+    	}
+  }
+  if (mode==1){
+  	pinLoop--;
+    	for(j=255;j>=0;j--){
+        	analogWrite(pins[pinLoop], j);
+          delay(1);
+        }
+      if(pinLoop == -1){
+          mode = 0;
+    	}
+  }
+  if (mode==2){
+    aux = distancia;
+    binario[4]=0;
+    binario[3]=0;
+    binario[2]=0;
+    binario[1]=0;
+    binario[0]=0;
+    for (j=0;aux > 0;){
+      binario[j++] = aux % 2;
+      aux /= 2;
+   }
+    Serial.println(distancia);
+      Serial.print(binario[4]);
+      Serial.print(binario[3]);
+      Serial.print(binario[2]);
+      Serial.print(binario[1]);
+      Serial.println(binario[0]);
+    digitalWrite(pins[0],binario[4]);
+    digitalWrite(pins[1],binario[3]);
+    digitalWrite(pins[2],binario[2]);
+    digitalWrite(pins[3],binario[1]);
+    digitalWrite(pins[4],binario[0]);
+  }
+  
+  delay(1000);
+}

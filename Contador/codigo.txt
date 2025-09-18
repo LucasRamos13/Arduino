@@ -1,0 +1,58 @@
+int pinLoop;
+int mode;
+int i;
+
+void setup()
+{
+  pinMode(5, INPUT);
+  pinMode(4, OUTPUT);
+  pinMode(3, OUTPUT);
+  pinMode(2, OUTPUT);
+  pinMode(1, OUTPUT);
+  pinMode(13, OUTPUT);
+
+  pinLoop = 0;
+  mode = 0;
+}
+
+void loop()
+{
+  if(digitalRead(5)){
+  	mode = 2;
+    digitalWrite(1, LOW);
+    digitalWrite(2, LOW);
+    digitalWrite(3, LOW);
+    digitalWrite(4, LOW);
+  };
+  if (mode==0){
+      pinLoop++;
+      digitalWrite(pinLoop, HIGH);
+      if(pinLoop == 5){
+          mode = 1;
+    	}
+  }
+  if (mode==1){
+  	pinLoop--;
+      digitalWrite(pinLoop, LOW);
+      if(pinLoop == 0){
+          mode = 0;
+    	}
+  }
+  if (mode==2){
+    mode = 3;
+    pinLoop=4;
+    while(mode==3){
+      if(digitalRead(pinLoop)){
+      	pinLoop--;
+      }else{
+        digitalWrite(pinLoop, HIGH);
+        for(i=4;i>pinLoop;i--){
+        	digitalWrite(i, LOW);
+        }
+        mode=2;
+      }
+    }
+  }
+  
+  delay(1000);
+}
